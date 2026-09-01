@@ -24,6 +24,16 @@ cp "$ROOT/ThirdParty/lib/libmpg123.dylib" "$STAGING/App/音声转换.app/Content
 cp "$ROOT/README.md" "$ROOT/VoiceConvertCLI/README.md" "$ROOT/NOTICE" "$ROOT/LICENSE" "$STAGING/Docs/"
 cp "$ROOT/ThirdParty/licenses/"* "$STAGING/ThirdParty/licenses/"
 
+# Ad-hoc signing so downloaded copies pass Gatekeeper's "damaged" check.
+# Users may still need to approve the app once (right-click > Open) because it is not notarized.
+codesign --force --sign - "$STAGING/App/音声转换.app/Contents/Frameworks/libmp3lame.dylib" >/dev/null
+codesign --force --sign - "$STAGING/App/音声转换.app/Contents/Frameworks/libmpg123.dylib" >/dev/null
+codesign --force --sign - "$STAGING/App/音声转换.app" >/dev/null
+codesign --force --sign - "$STAGING/CLI/voiceconvert" >/dev/null
+
+codesign --verify --strict "$STAGING/App/音声转换.app"
+codesign --verify --strict "$STAGING/CLI/voiceconvert"
+
 cat > "$STAGING/README.txt" <<EOF
 Hiko-VoiceConvert v${VERSION} macOS arm64
 
@@ -31,8 +41,9 @@ App: App/音声转换.app
 CLI: CLI/voiceconvert
 
 System requirement: macOS 26.0+, Apple Silicon arm64.
-This archive is an unsigned development release and is not notarized.
-Gatekeeper may require manual approval before opening the App.
+This archive is ad-hoc signed but NOT Developer-ID signed or notarized.
+If macOS reports the app cannot be verified, right-click the app and choose
+Open, or run: xattr -dr com.apple.quarantine "App/音声转换.app"
 Third-party license files are in ThirdParty/licenses/.
 EOF
 
@@ -51,7 +62,10 @@ mv "$STAGING" "$DIST"
   cd "$ROOT/build"
   /usr/bin/zip -X -q -r "$(basename "$DIST").zip" "$(basename "$DIST")"
 )
-shasum -a 256 "$DIST.zip" > "$DIST.zip.sha256"
+(
+  cd "$ROOT/build"
+  shasum -a 256 "$(basename "$DIST").zip" > "$(basename "$DIST").zip.sha256"
+)
 
 ZIP_ENTRIES="$(unzip -Z1 "$DIST.zip")"
 [[ "$ZIP_ENTRIES" == *"/App/"* ]]
