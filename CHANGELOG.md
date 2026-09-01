@@ -1,5 +1,23 @@
 # 变更日志
 
+## 1.1.0 - 2026-09-01
+
+### 新增
+
+- 统一的“音频转换”“字幕转换”“配对处理”三模块 macOS SwiftUI 界面
+- WebVTT → LRC：宽松/严格解析、HTML/karaoke 清洗、可选说话人前缀、UTF-8 无 BOM 输出和预览统计
+- Foundation-only 核心工作流模型：递归扫描、隐藏项与符号链接跳过、规范化去重、冲突命名、输入快照、任务状态和最近 30 批次模型
+- 大小写不敏感的安全主干配对，支持 `track.mp3.vtt`、`track.flac.vtt`、`track.aiff.vtt` 等伴随字幕，并拒绝歧义配对
+- SwiftPM `VoiceConvertCore` 和 `VoiceConvertCLI` 包；CLI 保留旧 `--convert` 参数并增加 `audio`、`subtitle`、`pair`
+- 工程统一到 Swift 6，版本号更新为 1.1.0，保留 arm64/macOS 26.0 和现有第三方库配置
+
+### 当前限制
+
+- App 的配对模块已接入成对 MP3/LRC 执行链、统一冲突策略、失败重试、任务快照和最近批次持久化。
+- CLI `audio` 已接入 AVFoundation 与仓库内 arm64 LAME/mpg123 静态后端，可实际批量生成 MP3；`pair` 已执行真实 MP3/LRC 成对批处理，并支持 suffix/skip/overwrite、输出目录和一次性 `--yes` 确认。
+- Developer ID 签名、公证、stapling 和第三方二进制完整来源核查尚未完成。
+- Core/CLI SwiftPM 测试已加入 GitHub Actions workflow；远程 run 需在 push 或 pull request 后确认。
+
 ## 1.0.0 - 首个公开整理版本
 
 ### 新增

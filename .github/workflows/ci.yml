@@ -5,7 +5,21 @@ on:
   pull_request:
 
 jobs:
+  swiftpm:
+    name: SwiftPM Core and CLI
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Test VoiceConvertCore
+        run: swift test --package-path VoiceConvertCore --disable-sandbox
+      - name: Test VoiceConvertCLI
+        run: swift test --package-path VoiceConvertCLI --disable-sandbox
+      - name: Build CLI product
+        run: swift build --package-path VoiceConvertCLI --product voiceconvert
+
   build-and-test:
+    name: Xcode App and XCTest
     runs-on: macos-26
     steps:
       - name: Checkout
@@ -27,4 +41,4 @@ jobs:
             -configuration Debug \
             -sdk macosx \
             -arch arm64 \
-            test CODE_SIGNING_ALLOWED=NO
+            test CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-

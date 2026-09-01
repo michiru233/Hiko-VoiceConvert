@@ -1,6 +1,6 @@
 import Foundation
 
-public enum VBRQuality: Int, CaseIterable, Identifiable, Codable {
+public enum VBRQuality: Int, CaseIterable, Identifiable, Codable, Sendable {
     case v0 = 0
     case v1 = 1
     case v2 = 2
@@ -42,7 +42,7 @@ public enum QualityPreset: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-public struct ConversionConfig: Codable, Equatable {
+public struct ConversionConfig: Codable, Equatable, Sendable {
     public var vbrQuality: VBRQuality
     public var fullStereo: Bool
     public var concurrency: Int
