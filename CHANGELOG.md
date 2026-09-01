@@ -16,7 +16,7 @@
 - App 的配对模块已接入成对 MP3/LRC 执行链、统一冲突策略、失败重试、任务快照和最近批次持久化。
 - CLI `audio` 已接入 AVFoundation 与仓库内 arm64 LAME/mpg123 静态后端，可实际批量生成 MP3；`pair` 已执行真实 MP3/LRC 成对批处理，并支持 suffix/skip/overwrite、输出目录和一次性 `--yes` 确认。
 - Developer ID 签名、公证、stapling 和第三方二进制完整来源核查尚未完成。
-- Core/CLI SwiftPM 测试已加入 GitHub Actions workflow；远程 run 需在 push 或 pull request 后确认。
+- Core/CLI SwiftPM 测试已加入 GitHub Actions workflow，并已由 tag `v1.1.0` 的远程 run 验证通过。
 
 ## 1.0.0 - 首个公开整理版本
 

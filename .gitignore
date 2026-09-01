@@ -5,6 +5,10 @@ DerivedData/
 *.xcuserstate
 xcuserdata/
 
+# SwiftPM build artifacts
+**/.build/
+**/.build
+
 # Swift/Xcode local files
 *.xccheckout
 *.moved-aside
