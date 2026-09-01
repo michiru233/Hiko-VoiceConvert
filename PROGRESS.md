@@ -31,6 +31,7 @@
 - Release 资产 `Hiko-VoiceConvert-v1.1.0-macos-arm64.zip` 和 `.sha256` 已上传；下载后 SHA256 校验通过，App/CLI/动态库均为 arm64，包内含许可证、NOTICE、LICENSE 和 README，未含测试 bundle、build 缓存、`.zcode`、临时文件或 `__MACOSX`。
 - tag `v1.1.0` 的远程 GitHub Actions run `33501853200` 与发布后 `main` run `33502128860` 均全部通过：SwiftPM Core/CLI/CLI build 和 Xcode App/XCTest 均为绿色。
 - 文档同步完成：AGENTS.md、README、CHANGELOG、PROGRESS、BLOCKED 已更新到 v1.1.0 现役状态；`.gitignore` 增加 `**/.build/` 防止 SwiftPM 缓存误提交。
+- 修复用户反馈的“应用程序已损害”：根因是发布包内 App 未签名，下载文件带 quarantine 标记时 macOS 报 damaged。`scripts/export-release.zsh` 现在对 App/CLI/动态库做 ad-hoc 签名，校验文件改为纯文件名；已重新上传 v1.1.0 资产并端到端验证（下载→校验→解压→签名校验→CLI 运行）。用户仍需右键打开或 `xattr -dr com.apple.quarantine` 一次，因为未公证。
 
 ## 尚未完成或待补证据
 
