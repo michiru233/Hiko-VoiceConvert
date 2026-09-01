@@ -1,0 +1,174 @@
+{
+  "sourceLanguage" : "zh-Hans",
+  "strings" : {
+    "action.addInput" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add input" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "入力を追加" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加输入" } }
+      }
+    },
+    "action.choose" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "選択" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择" } }
+      }
+    },
+    "action.clear" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clear authorization" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "認証を解除" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "清除授权" } }
+      }
+    },
+    "action.done" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "完了" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "完成" } }
+      }
+    },
+    "license.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Third-party libraries are distributed under their respective licenses. Keep the NOTICE and license files when redistributing." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "サードパーティライブラリは各ライセンスに従って配布されます。再配布時は NOTICE とライセンスファイルを保持してください。" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "第三方库按各自许可证分发。重新分发时请保留 NOTICE 和许可证文件。" } }
+      }
+    },
+    "license.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Licenses" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ライセンス" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "许可证" } }
+      }
+    },
+    "module.audio" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio conversion" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音声変換" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "音频转换" } }
+      }
+    },
+    "module.pairing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pair processing" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ペア処理" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "配对处理" } }
+      }
+    },
+    "module.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Subtitle conversion" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "字幕変換" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "字幕转换" } }
+      }
+    },
+    "settings.concurrency" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Workers: %lld" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "並列数: %lld" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "并发数：%lld" } }
+      }
+    },
+    "settings.deleteSource" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete source after success" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "成功後に元ファイルを削除" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "成功后删除源文件" } }
+      }
+    },
+    "settings.diagnostic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export diagnostics" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "診断をエクスポート" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "导出诊断" } }
+      }
+    },
+    "settings.export" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export settings" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "設定を書き出す" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "导出设置" } }
+      }
+    },
+    "settings.import" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Import settings" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "設定を読み込む" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "导入设置" } }
+      }
+    },
+    "settings.licenses" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View licenses" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ライセンスを見る" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "查看许可证" } }
+      }
+    },
+    "settings.outputDirectory" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Output directory" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "出力フォルダ" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "输出目录" } }
+      }
+    },
+    "settings.outputDirectory.default" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Default Music folder" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "デフォルトの Music フォルダ" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "默认 Music 文件夹" } }
+      }
+    },
+    "settings.quality" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quality" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "品質" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "质量" } }
+      }
+    },
+    "settings.speakers" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keep speaker prefixes" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "話者名プレフィックスを保持" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保留说话人前缀" } }
+      }
+    },
+    "settings.strict" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Strict subtitle parsing" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "字幕を厳密に解析" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "严格字幕解析" } }
+      }
+    },
+    "settings.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "設定" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

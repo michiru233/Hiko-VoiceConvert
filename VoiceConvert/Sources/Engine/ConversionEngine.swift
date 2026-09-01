@@ -86,12 +86,13 @@ public final class ConversionEngine: @unchecked Sendable {
         outputURL: URL,
         config: ConversionConfig = ConversionConfig(),
         progress: (@Sendable (Double) -> Void)? = nil,
-        isCancelled: (@Sendable () -> Bool)? = nil
+        isCancelled: (@Sendable () -> Bool)? = nil,
+        overwrite: Bool = false
     ) throws -> ConversionResult {
         guard outputURL.pathExtension.lowercased() == "mp3" else {
             throw ConversionError.unsupportedFormat("输出文件必须使用 .mp3 扩展名")
         }
-        if FileManager.default.fileExists(atPath: outputURL.path) {
+        if FileManager.default.fileExists(atPath: outputURL.path), !overwrite {
             throw ConversionError.cannotCreateOutput("输出文件已存在，不会覆盖：\(outputURL.lastPathComponent)")
         }
         if isCancelled?() == true { throw ConversionError.cancelled }
@@ -211,10 +212,14 @@ public final class ConversionEngine: @unchecked Sendable {
         }
 
         do {
-            guard !FileManager.default.fileExists(atPath: outputURL.path) else {
-                throw ConversionError.cannotCreateOutput("输出文件已存在，不会覆盖：\(outputURL.lastPathComponent)")
+            if overwrite, FileManager.default.fileExists(atPath: outputURL.path) {
+                _ = try FileManager.default.replaceItemAt(outputURL, withItemAt: tempURL)
+            } else {
+                guard !FileManager.default.fileExists(atPath: outputURL.path) else {
+                    throw ConversionError.cannotCreateOutput("输出文件已存在，不会覆盖：\(outputURL.lastPathComponent)")
+                }
+                try publishWithoutReplacement(tempURL: tempURL, outputURL: outputURL)
             }
-            try publishWithoutReplacement(tempURL: tempURL, outputURL: outputURL)
         } catch let error as ConversionError {
             throw error
         } catch {

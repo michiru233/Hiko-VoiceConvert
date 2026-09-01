@@ -89,6 +89,38 @@ final class ConversionEngineTests: XCTestCase {
         XCTAssertTrue(fileManager.fileExists(atPath: output.path))
     }
 
+    func testPairedExecutorProducesRealMP3AndLRCInSameDirectory() async throws {
+        let inputRoot = root.appendingPathComponent("input")
+        let outputRoot = root.appendingPathComponent("output")
+        try fileManager.createDirectory(at: inputRoot, withIntermediateDirectories: true)
+        let audio = inputRoot.appendingPathComponent("scene.wav")
+        let subtitle = inputRoot.appendingPathComponent("scene.wav.vtt")
+        try makeWAV(at: audio, sampleRate: 48_000, duration: 0.2)
+        try Data("WEBVTT\n\n00:00.010 --> 00:00.100\nScene\n".utf8).write(to: subtitle)
+        let audioInput = ScannedInput(url: audio, kind: .audio, root: inputRoot, relativePath: "scene.wav")
+        let subtitleInput = ScannedInput(url: subtitle, kind: .subtitle, root: inputRoot, relativePath: "scene.wav.vtt")
+        let pair = AudioSubtitlePair(audio: audioInput, subtitle: subtitleInput)
+        let plan = try PairBatchPlanner().makePlan(from: PairingResult(pairs: [pair], issues: []), outputRoot: outputRoot)
+        let config = ConversionConfig()
+        let completed = await PairBatchExecutor().execute(plan: plan, audioExecutor: { input, output, progress, cancelled, overwrite in
+            do {
+                _ = try ConversionEngine().convert(inputURL: input, outputURL: output, config: config,
+                                                   progress: progress, isCancelled: cancelled, overwrite: overwrite)
+                return .succeeded
+            } catch let error as ConversionError where error == .cancelled { return .cancelled }
+            catch { return .failed(error.localizedDescription) }
+        })
+        let mp3 = try XCTUnwrap(completed.tasks.first { $0.operation == .mp3 }?.outputURL)
+        let lrc = try XCTUnwrap(completed.tasks.first { $0.operation == .lrc }?.outputURL)
+        XCTAssertEqual(mp3.deletingLastPathComponent(), lrc.deletingLastPathComponent())
+        XCTAssertEqual(mp3.deletingPathExtension().lastPathComponent, lrc.deletingPathExtension().lastPathComponent)
+        XCTAssertTrue(fileManager.fileExists(atPath: mp3.path))
+        XCTAssertTrue(fileManager.fileExists(atPath: lrc.path))
+        XCTAssertEqual(completed.tasks.first { $0.role == .pairing }?.status, .succeeded)
+        let lrcData = try Data(contentsOf: lrc)
+        XCTAssertNotEqual(lrcData.prefix(3), Data([0xEF, 0xBB, 0xBF]))
+        XCTAssertFalse(lrcData.contains(0x0D))
+    }
     private func makeWAV(at url: URL, sampleRate: Double, duration: TimeInterval) throws {
         let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
         let frames = AVAudioFrameCount((sampleRate * duration).rounded())
