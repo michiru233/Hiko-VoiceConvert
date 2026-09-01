@@ -13,7 +13,7 @@ xcodebuild -project VoiceConvert.xcodeproj -scheme VoiceConvert -configuration D
 xcodebuild -project VoiceConvert.xcodeproj -scheme VoiceConvert -configuration Debug -sdk macosx test CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
 ```
 
-当前 GitHub 源码快照缺少 3 个 `ThirdParty/lib` 文件，因此本机依赖完整时才能构建；Release 资产见 GitHub `v1.0.0`。
+当前 GitHub 源码已包含 3 个 `ThirdParty/lib` 文件，本机 Release 构建和 ad hoc 签名验证通过，GitHub Release `v1.0.0` 已发布。Developer ID 签名、公证和完整第三方来源核查仍待完成。
 
 ## 技术栈
 
