@@ -34,7 +34,7 @@
 - GitHub Actions workflow 已扩展为独立 `swiftpm` job（Core 66/66、CLI 5/5、CLI product build）和 `build-and-test` job（Xcode arm64 build/test）；本地执行同等命令全部通过，远程 run 仍待下一次 push/PR。
 - `v1.1.0` 已通过 PR #1 合并到 `main`，合并提交为 `3dec002c1b13c1928faadd26be38d7ea4c30c831`；GitHub Release 已发布：https://github.com/michiru233/Hiko-VoiceConvert/releases/tag/v1.1.0。
 - Release 资产 `Hiko-VoiceConvert-v1.1.0-macos-arm64.zip` 和 `.sha256` 已上传；下载后 SHA256 校验通过，App/CLI/动态库均为 arm64，包内含许可证、NOTICE、LICENSE 和 README，未含测试 bundle、build 缓存、`.zcode`、临时文件或 `__MACOSX`。
-- tag `v1.1.0` 触发的远程 GitHub Actions run `33501853200` 全部通过：SwiftPM Core/CLI/CLI build 与 Xcode App/XCTest 均为绿色。
+- tag `v1.1.0` 的远程 GitHub Actions run `33501853200` 与发布后 `main` run `33502128860` 均全部通过：SwiftPM Core/CLI/CLI build 和 Xcode App/XCTest 均为绿色。
 
 ## 本轮命令
 
