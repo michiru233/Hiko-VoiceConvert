@@ -75,6 +75,7 @@ final class VoiceConvertViewModel: ObservableObject {
     private var task: Task<Void, Never>?
 
     init() {
+        queue.onUpdate = { [weak self] in self?.sync() }
         if let data = UserDefaults.standard.data(forKey: "VoiceConvert.ConversionConfig"), let saved = try? JSONDecoder().decode(ConversionConfig.self, from: data) { config = saved }
         strictMode = UserDefaults.standard.bool(forKey: "VoiceConvert.StrictMode")
         keepSpeakers = UserDefaults.standard.bool(forKey: "VoiceConvert.KeepSpeakers")
@@ -177,7 +178,7 @@ final class VoiceConvertViewModel: ObservableObject {
         exportDiagnostic(to: url)
     }
     func exportDiagnostic(to url: URL) {
-        let report = AppSettingsController.diagnosticReport(appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.1.0", recentBatchCount: recentBatches.batches.count, tasks: pairTasks)
+        let report = AppSettingsController.diagnosticReport(appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.1.1", recentBatchCount: recentBatches.batches.count, tasks: pairTasks)
         do { try report.save(to: url); banner = "诊断报告已导出" }
         catch { banner = "诊断报告导出失败：\(error.localizedDescription)" }
     }
@@ -452,12 +453,17 @@ struct AudioView: View {
     var body: some View {
         VStack(spacing: 14) {
             DropHint(text: "拖入音频文件或文件夹", detail: "支持 WAV、FLAC、AIFF、AIF、M4A，目录递归扫描")
+            if !model.audioItems.isEmpty {
+                progressSummary
+            }
             HStack {
                 GroupBox("转换队列") {
                     if model.audioItems.isEmpty {
                         ContentUnavailableView("队列为空", systemImage: "tray")
                     } else {
-                        List(model.audioItems) { item in Text(item.inputURL.lastPathComponent) }
+                        List(model.audioItems) { item in
+                            AudioQueueRow(item: item)
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -472,7 +478,7 @@ struct AudioView: View {
                 .frame(width: 240)
             }
             HStack {
-                Text("\(model.summary.succeeded) 成功 · \(model.summary.failed) 失败").foregroundStyle(.secondary)
+                Text(summaryText).foregroundStyle(.secondary)
                 Spacer()
                 if model.isRunning {
                     Button(model.isPaused ? "继续" : "暂停") { model.isPaused ? model.resume() : model.pause() }
@@ -484,6 +490,126 @@ struct AudioView: View {
             }
         }
         .padding(18)
+    }
+
+    private var activeItems: [QueueItem] {
+        model.audioItems.filter { $0.state == .converting }
+    }
+
+    private var overallProgress: Double {
+        guard !model.audioItems.isEmpty else { return 0 }
+        return model.audioItems.reduce(0) { $0 + $1.progress } / Double(model.audioItems.count)
+    }
+
+    private var progressTitle: String {
+        if model.isRunning { return model.isPaused ? "转换已暂停" : "正在转换" }
+        if model.summary.succeeded + model.summary.failed + model.summary.cancelled > 0 { return "本批次已结束" }
+        return "准备转换"
+    }
+
+    private var activeFileDescription: String {
+        guard let first = activeItems.first else {
+            return model.isRunning ? "正在准备转换任务" : "共 \(model.summary.total) 个文件"
+        }
+        if activeItems.count == 1 { return first.inputURL.lastPathComponent }
+        return "\(first.inputURL.lastPathComponent) 等 \(activeItems.count) 个文件"
+    }
+
+    private var summaryText: String {
+        var parts = ["\(model.summary.succeeded) 成功", "\(model.summary.failed) 失败"]
+        if model.summary.cancelled > 0 { parts.append("\(model.summary.cancelled) 已取消") }
+        return parts.joined(separator: " · ")
+    }
+
+    private var progressSummary: some View {
+        GroupBox("转换进度") {
+            HStack(alignment: .center, spacing: 16) {
+                Image(systemName: model.isRunning && !model.isPaused ? "waveform" : "checkmark.circle")
+                    .font(.title2)
+                    .foregroundStyle(model.isRunning ? Color.accentColor : Color.secondary)
+                    .frame(width: 28)
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text(progressTitle).font(.headline)
+                        Text("\(model.summary.succeeded + model.summary.failed + model.summary.cancelled) / \(model.summary.total)")
+                            .font(.callout.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(activeFileDescription)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    ProgressView(value: overallProgress)
+                        .progressViewStyle(.linear)
+                        .tint(model.summary.failed > 0 ? .orange : .accentColor)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                Text(overallProgress.formatted(.percent.precision(.fractionLength(0))))
+                    .font(.title3.monospacedDigit().weight(.semibold))
+                    .frame(minWidth: 54, alignment: .trailing)
+            }
+            .padding(.vertical, 4)
+        }
+    }
+}
+
+private struct AudioQueueRow: View {
+    let item: QueueItem
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 10) {
+            Image(systemName: statusIcon)
+                .foregroundStyle(statusColor)
+                .frame(width: 16)
+            VStack(alignment: .leading, spacing: 5) {
+                Text(item.inputURL.lastPathComponent)
+                    .lineLimit(1)
+                HStack(spacing: 8) {
+                    ProgressView(value: item.progress)
+                        .progressViewStyle(.linear)
+                        .tint(statusColor)
+                    Text(item.progress.formatted(.percent.precision(.fractionLength(0))))
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        .frame(width: 38, alignment: .trailing)
+                }
+                Text(statusText)
+                    .font(.caption)
+                    .foregroundStyle(statusColor)
+                    .lineLimit(1)
+            }
+        }
+        .padding(.vertical, 3)
+    }
+
+    private var statusIcon: String {
+        switch item.state {
+        case .waiting: return "clock"
+        case .converting: return "waveform"
+        case .succeeded: return "checkmark.circle.fill"
+        case .failed: return "exclamationmark.circle.fill"
+        case .cancelled: return "xmark.circle"
+        }
+    }
+
+    private var statusColor: Color {
+        switch item.state {
+        case .waiting: return .secondary
+        case .converting: return .accentColor
+        case .succeeded: return .green
+        case .failed: return .red
+        case .cancelled: return .orange
+        }
+    }
+
+    private var statusText: String {
+        switch item.state {
+        case .waiting: return "等待转换"
+        case .converting: return "正在转换"
+        case .succeeded: return "转换完成"
+        case .failed(let reason): return "转换失败：\(reason)"
+        case .cancelled: return "已取消"
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 # 当前进度
 
-目标是将音频转换、WebVTT→LRC 字幕转换和配对处理统一为可批量使用、可测试、可发布的 macOS 原生 v1.1.0 工具。
+目标是将音频转换、WebVTT→LRC 字幕转换和配对处理统一为可批量使用、可测试、可发布的 macOS 原生 v1.1.1 工具。
 
 ## 已完成并验证
 
@@ -9,12 +9,12 @@
 - 设置快照、导入保护、版本化批次 JSON、v0 迁移备份和迁移失败隔离模型。
 - SwiftPM CLI 已接入真实 AVFoundation/LAME 音频后端：`audio` 预检与 MP3 批处理、`subtitle`、`pair` 均可执行，保留 `--convert` 兼容参数和退出码约定。
 - App 首版三模块 `音频转换`、`字幕转换`、`配对处理` UI；产品名、Bundle ID、arm64、macOS 26.0 和第三方库引用保持不变。
-- Swift 6 工程集成；版本号为 1.1.0。
+- Swift 6 工程集成；版本号为 1.1.1。
 - 配对核心已修复 `.flac/.aiff` 伴随字幕主干解析、严格一对一匹配、未匹配音频提示；输出规划器已拒绝相对路径穿越和输入/输出根目录重合。
 - CLI `VoiceConvertAudioBackend` 已在 SwiftPM 中静态链接仓库内 arm64 `libmp3lame.a`/`libmpg123.a`，使用 AVFoundation 解码、LAME 分块编码、重新解码校验、临时文件和原子发布。
 - CLI `audio` 已支持真实批量 MP3、`--check`、`--output`、`--policy suffix|skip|overwrite` 和 `--yes`；`pair` 已接入真实 MP3/LRC 父子任务执行链。
 - CLIKit 已拆出可测试入口，保留 `--convert`、`audio`、`subtitle`、`pair` 和退出码 0/1/64/66/69。
-- App 安全作用域书签已覆盖启动恢复、无效授权清理、目录选择、访问会话和清除授权；设置导入导出仅处理普通 `SettingsSnapshot`，保留书签、最近批次和运行中任务；三语 String Catalog 已实际编译为 `en`、`ja`、`zh-Hans` bundle 资源；诊断报告使用路径/状态脱敏 JSON 并可导出。
+- 音频转换队列已显示实时批次总进度、当前文件以及逐项状态和百分比；进度来自既有转换引擎回调，不改变 MP3 转换逻辑。
 
 ## 当前验证
 

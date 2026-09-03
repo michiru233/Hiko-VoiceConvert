@@ -15,7 +15,7 @@ swift test --package-path VoiceConvertCore --disable-sandbox
 swift test --package-path VoiceConvertCLI --disable-sandbox
 ```
 
-GitHub Actions 在 push/PR 上运行上述 SwiftPM 与 Xcode 命令。GitHub Release `v1.1.0` 已发布；Developer ID 签名、公证和完整第三方来源核查仍待完成。
+GitHub Actions 在 push/PR 上运行上述 SwiftPM 与 Xcode 命令。GitHub Release `v1.1.0` 已发布；本地 `v1.1.1` 进度反馈更新待推送。Developer ID 签名、公证和完整第三方来源核查仍待完成。
 
 ## 技术栈
 
@@ -35,4 +35,4 @@ Swift 6、SwiftUI/AppKit、AVFoundation、Combine，以及内置 arm64 LAME/mpg1
 
 ## 当前状态
 
-Release `v1.1.0` 已发布并验证（PR #1、tag v1.1.0、远程 CI 全绿）。Developer ID 签名、公证、完整第三方来源核查仍待完成。下一步候选：GUI 自包含导出目录、CLI 取消/重试/最近批次、三条工作流统一最近批次记录。
+Release `v1.1.0` 已发布并验证（PR #1、tag v1.1.0、远程 CI 全绿）。当前 `v1.1.1` 发布准备正在进行；Developer ID 签名、公证、完整第三方来源核查仍待完成。下一步候选：GUI 自包含导出目录、CLI 取消/重试/最近批次、三条工作流统一最近批次记录。

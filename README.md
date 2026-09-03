@@ -8,7 +8,7 @@
 - 字幕转换：WebVTT → LRC，支持宽松/严格解析、HTML/karaoke 清洗和可选说话人前缀
 - 配对处理：大小写不敏感的安全主干名匹配；支持 `track.mp3.vtt`、`track.flac.vtt` 等伴随字幕；歧义项不会自动配对
 - 文件夹递归扫描，跳过隐藏项和符号链接目录，规范化路径去重并保留相对目录结构
-- 音频队列支持并发、暂停、继续和取消；默认不覆盖已有输出
+- 音频队列支持并发、暂停、继续和取消；实时显示批次总进度、当前文件和每项转换状态；默认不覆盖已有输出
 - 应用提供“音频转换”“字幕转换”“配对处理”三个平级模块和最近批次摘要
 
 ## 系统要求
@@ -40,7 +40,7 @@ swift test --package-path VoiceConvertCLI --disable-sandbox
 
 ## 项目状态与限制
 
-这是一个面向 Apple Silicon 的早期 v1.1.0 版本。当前工程配置为本机开发构建：未配置 Developer ID Application 签名，也未完成 notarization 和 stapling。直接分发前需要使用正式开发者账号重新签名并完成公证。
+这是一个面向 Apple Silicon 的早期 v1.1.1 版本。当前工程配置为本机开发构建：未配置 Developer ID Application 签名，也未完成 notarization 和 stapling。直接分发前需要使用正式开发者账号重新签名并完成公证。
 
 仓库中的许可证、头文件和构建所需的 LAME/mpg123 库位于 `ThirdParty/`。现有二进制来自本机 Homebrew bottle；目前无法从仓库记录确认精确的上游版本、完整下载来源或对应源码包。因此第三方二进制的再分发合规性仍待核查，不能将当前依赖描述为完全可复现的源码构建。
 

@@ -44,6 +44,7 @@ public final class BatchQueue {
     public private(set) var isRunning = false
     public private(set) var isPaused = false
     public private(set) var summary = QueueSummary(total: 0, succeeded: 0, failed: 0, cancelled: 0)
+    public var onUpdate: (@MainActor () -> Void)?
 
     private let engine: ConversionEngine
     private let cancellationState = CancellationBox()
@@ -70,6 +71,7 @@ public final class BatchQueue {
             }
         }
         updateSummary()
+        notifyUpdate()
     }
 
     public func clear() {
@@ -77,20 +79,24 @@ public final class BatchQueue {
         items.removeAll()
         inputRoots.removeAll()
         updateSummary()
+        notifyUpdate()
     }
 
     public func pause() {
         pauseState.set()
         isPaused = true
+        notifyUpdate()
     }
 
     public func resume() {
         pauseState.reset()
         isPaused = false
+        notifyUpdate()
     }
 
     public func cancel() {
         cancellationState.set()
+        notifyUpdate()
     }
 
     public func run(
@@ -102,6 +108,7 @@ public final class BatchQueue {
         isRunning = true
         cancellationState.reset()
         pauseState.reset()
+        notifyUpdate()
 
         let outputRoot = (config.outputDirectory ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Music/音声库")).standardizedFileURL
         var reserved = Set<String>()
@@ -122,6 +129,7 @@ public final class BatchQueue {
             }
         }
         updateSummary()
+        notifyUpdate()
 
         let deleteSources: Bool
         if config.deleteSourceOnSuccess && !plans.isEmpty {
@@ -182,11 +190,13 @@ public final class BatchQueue {
         isRunning = false
         isPaused = false
         updateSummary()
+        notifyUpdate()
     }
 
     private func setProgress(index: Int, value: Double) {
         guard items.indices.contains(index) else { return }
         items[index].progress = min(1, max(0, value))
+        notifyUpdate()
     }
 
     private func setState(index: Int, state: QueueItemState) {
@@ -194,6 +204,11 @@ public final class BatchQueue {
         items[index].state = state
         if state == .succeeded { items[index].progress = 1 }
         updateSummary()
+        notifyUpdate()
+    }
+
+    private func notifyUpdate() {
+        onUpdate?()
     }
 
     private func updateSummary() {
