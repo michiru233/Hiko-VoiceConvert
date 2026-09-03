@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="${1:-1.1.4}"
+VERSION="${1:-1.1.5}"
 STAGING="$ROOT/build/release-staging"
 DIST="$ROOT/build/Hiko-VoiceConvert-v${VERSION}-macos-arm64"
 APP="$ROOT/build/Release/音声转换.app"

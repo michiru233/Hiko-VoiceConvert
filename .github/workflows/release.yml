@@ -1,0 +1,84 @@
+name: Publish macOS release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: macos-26
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v4
+
+      - name: Validate tag matches application version
+        shell: zsh
+        run: |
+          set -euo pipefail
+          tag_version="${GITHUB_REF_NAME#v}"
+          app_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' VoiceConvert/Resources/Info.plist)"
+          update_version="$(rg -o 'currentVersionString = "[0-9]+\.[0-9]+\.[0-9]+"' VoiceConvertCore/Sources/VoiceConvertCore/UpdateCore.swift | rg -o '[0-9]+\.[0-9]+\.[0-9]+')"
+          test "$tag_version" = "$app_version"
+          test "$tag_version" = "$update_version"
+
+      - name: Test VoiceConvertCore
+        run: swift test --package-path VoiceConvertCore --disable-sandbox
+
+      - name: Test VoiceConvertCLI
+        run: swift test --package-path VoiceConvertCLI --disable-sandbox
+
+      - name: Test Xcode app
+        run: |
+          xcodebuild \
+            -project VoiceConvert.xcodeproj \
+            -scheme VoiceConvert \
+            -configuration Debug \
+            -sdk macosx \
+            -arch arm64 \
+            test CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
+
+      - name: Build release app and CLI
+        run: |
+          xcodebuild \
+            -project VoiceConvert.xcodeproj \
+            -scheme VoiceConvert \
+            -configuration Release \
+            -sdk macosx \
+            -arch arm64 \
+            build CODE_SIGNING_ALLOWED=NO
+          swift build --package-path VoiceConvertCLI -c release --disable-sandbox
+
+      - name: Package and verify release archive
+        shell: zsh
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          zsh scripts/export-release.zsh "$version"
+          archive="build/Hiko-VoiceConvert-v${version}-macos-arm64.zip"
+          checksum="${archive}.sha256"
+          expected="$(cut -d' ' -f1 "$checksum")"
+          actual="$(shasum -a 256 "$archive" | cut -d' ' -f1)"
+          test "$expected" = "$actual"
+          codesign --verify --strict "build/Hiko-VoiceConvert-v${version}-macos-arm64/App/音声转换.app"
+          codesign --verify --strict "build/Hiko-VoiceConvert-v${version}-macos-arm64/CLI/voiceconvert"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: zsh
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          archive="build/Hiko-VoiceConvert-v${version}-macos-arm64.zip"
+          checksum="${archive}.sha256"
+          notes="RELEASE_NOTES_v${version}.md"
+          if [[ -f "$notes" ]]; then
+            gh release create "$GITHUB_REF_NAME" "$archive" "$checksum" --title "Hiko-VoiceConvert v${version}" --notes-file "$notes"
+          else
+            gh release create "$GITHUB_REF_NAME" "$archive" "$checksum" --title "Hiko-VoiceConvert v${version}" --generate-notes
+          fi

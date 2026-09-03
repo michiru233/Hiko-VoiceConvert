@@ -4,7 +4,7 @@ import Foundation
 public enum UpdateConfiguration {
     public static let productName = "音声转换"
     public static let bundleIdentifier = "com.voiceconvert.app"
-    public static let currentVersionString = "1.1.4"
+    public static let currentVersionString = "1.1.5"
     public static let currentVersion = SemanticVersion(tag: "v\(currentVersionString)")!
     public static let repository = "michiru233/Hiko-VoiceConvert"
     public static let latestReleaseURL = URL(string: "https://api.github.com/repos/\(repository)/releases/latest")!
