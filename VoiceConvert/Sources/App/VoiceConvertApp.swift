@@ -5,7 +5,26 @@ import AppKit
 
 @main
 struct VoiceConvertApp: App {
-    var body: some Scene { WindowGroup("音声转换") { ContentView() }.defaultSize(width: 980, height: 680) }
+    @StateObject private var updater = UpdateManager()
+
+    var body: some Scene {
+        WindowGroup("音声转换") {
+            ContentView()
+                .task { await updater.check(silent: true) }
+        }
+        .defaultSize(width: 980, height: 680)
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("关于音声转换") { NSApplication.shared.orderFrontStandardAboutPanel(nil) }
+                Divider()
+                Button("检查更新…") { Task { await updater.check() } }
+                    .disabled(updater.isBusy)
+                if case .available = updater.state {
+                    Button("下载并安装更新…") { updater.installAvailable() }
+                }
+            }
+        }
+    }
 }
 
 enum WorkspaceModule: String, CaseIterable, Identifiable {

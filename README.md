@@ -34,13 +34,13 @@ swift test --package-path VoiceConvertCLI --disable-sandbox
 
 ## 使用方式
 
-构建并运行 `音声转换.app` 后，可拖入文件或文件夹，或使用“添加输入”。音频输出默认写入 Music/音声库，字幕输出写在源文件旁；应用不会默认删除源文件，也不会覆盖已有输出。CLI 用法和退出码见 [VoiceConvertCLI/README.md](VoiceConvertCLI/README.md)。发布压缩包包含 App、CLI、运行库、许可证和帮助文档，详见 GitHub Releases。
+构建并运行 `音声转换.app` 后，可拖入文件或文件夹，或使用“添加输入”。音频输出默认写入 Music/音声库，字幕输出写在源文件旁；应用不会默认删除源文件，也不会覆盖已有输出。应用启动后会后台检查 GitHub Releases，也可以使用菜单“音声转换 → 检查更新…”。只有用户确认“下载并安装”后才会下载 arm64 包，并依次验证 SHA-256、压缩包路径、应用标识、版本和签名；自动替换不可用时会保留原应用并打开 Release 下载页。CLI 用法和退出码见 [VoiceConvertCLI/README.md](VoiceConvertCLI/README.md)。发布压缩包包含 App、CLI、运行库、许可证和帮助文档，详见 GitHub Releases。
 
 当前 CLI 支持 `audio`、`subtitle` 和 `pair` 三个子命令。`audio` 使用仓库内 arm64 LAME/mpg123 静态库和 AVFoundation 执行真实 MP3 转换；`pair` 使用同一音频后端生成同目录同主干的 MP3/LRC。支持 `--output`、`--policy suffix|skip|overwrite`、`--yes`，`audio --check` 仍只做预检。命令输出、冲突保护和退出码见 [VoiceConvertCLI/README.md](VoiceConvertCLI/README.md)。
 
 ## 项目状态与限制
 
-这是一个面向 Apple Silicon 的早期 v1.1.1 版本。当前工程配置为本机开发构建：未配置 Developer ID Application 签名，也未完成 notarization 和 stapling。直接分发前需要使用正式开发者账号重新签名并完成公证。
+这是一个面向 Apple Silicon 的早期 v1.1.2 版本。当前工程配置为本机开发构建：未配置 Developer ID Application 签名，也未完成 notarization 和 stapling。直接分发前需要使用正式开发者账号重新签名并完成公证。
 
 仓库中的许可证、头文件和构建所需的 LAME/mpg123 库位于 `ThirdParty/`。现有二进制来自本机 Homebrew bottle；目前无法从仓库记录确认精确的上游版本、完整下载来源或对应源码包。因此第三方二进制的再分发合规性仍待核查，不能将当前依赖描述为完全可复现的源码构建。
 
