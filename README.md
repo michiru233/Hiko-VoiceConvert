@@ -40,11 +40,11 @@ swift test --package-path VoiceConvertCLI --disable-sandbox
 
 ## 项目状态与限制
 
-这是一个面向 Apple Silicon 的早期 v1.1.2 版本。当前工程配置为本机开发构建：未配置 Developer ID Application 签名，也未完成 notarization 和 stapling。直接分发前需要使用正式开发者账号重新签名并完成公证。
+这是一个面向 Apple Silicon 的早期 v1.1.3 版本。当前工程配置为本机开发构建：未配置 Developer ID Application 签名，也未完成 notarization 和 stapling。直接分发前需要使用正式开发者账号重新签名并完成公证。
 
 仓库中的许可证、头文件和构建所需的 LAME/mpg123 库位于 `ThirdParty/`。现有二进制来自本机 Homebrew bottle；目前无法从仓库记录确认精确的上游版本、完整下载来源或对应源码包。因此第三方二进制的再分发合规性仍待核查，不能将当前依赖描述为完全可复现的源码构建。
 
-统一任务状态、输入快照、最近 30 批次持久化、设置导入导出、安全作用域书签、三语 String Catalog 和脱敏诊断报告已接入；GitHub Actions 扩展仍待完成。
+统一任务状态、输入快照、最近 30 批次持久化、设置导入导出、安全作用域书签、三语 String Catalog、脱敏诊断报告和 GitHub Releases 更新流程已接入。GitHub Actions 当前负责 Core/CLI 测试、CLI 构建和 Xcode App/XCTest；Release 压缩包仍由 `scripts/export-release.zsh` 在本机生成后上传。
 
 ## 第三方依赖
 
