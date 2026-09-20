@@ -89,6 +89,35 @@ final class ConversionEngineTests: XCTestCase {
         XCTAssertTrue(fileManager.fileExists(atPath: output.path))
     }
 
+    func testOutputCarriesVBRHeaderSoPlaybackDurationMatchesSource() throws {
+        let input = root.appendingPathComponent("tone.wav")
+        let output = root.appendingPathComponent("tone.mp3")
+        try makeWAV(at: input, sampleRate: 48_000, duration: 1.0)
+
+        let result = try ConversionEngine().convert(inputURL: input, outputURL: output)
+
+        // 播放器显示的时长来自 Xing/Info 头；该头缺失时只能按首帧码率估算，时长就对不上。
+        let playbackDuration = try XCTUnwrap(vbrHeaderDuration(of: output, sampleRate: 48_000))
+        XCTAssertEqual(playbackDuration, result.source.duration, accuracy: 0.1)
+    }
+
+    /// Xing/Info 头记录的总帧数换算出的时长，即播放器实际显示的时长。返回 nil 表示该头缺失。
+    private func vbrHeaderDuration(of mp3: URL, sampleRate: Double) throws -> TimeInterval? {
+        let bytes = Array(try Data(contentsOf: mp3).prefix(2_048))
+        let magics = [Array("Xing".utf8), Array("Info".utf8)]
+        guard let start = bytes.indices.first(where: { index in
+            let rest = bytes[index...]
+            return magics.contains { rest.starts(with: $0) }
+        }) else { return nil }
+        let flagsIndex = start + 4
+        let framesIndex = flagsIndex + 4
+        guard framesIndex + 4 <= bytes.count else { return nil }
+        let flags = bytes[flagsIndex..<flagsIndex + 4].reduce(0) { ($0 << 8) | Int($1) }
+        guard flags & 0x1 == 1 else { return nil }
+        let frames = bytes[framesIndex..<framesIndex + 4].reduce(0) { ($0 << 8) | Int($1) }
+        return Double(frames) * 1_152 / sampleRate
+    }
+
     func testPairedExecutorProducesRealMP3AndLRCInSameDirectory() async throws {
         let inputRoot = root.appendingPathComponent("input")
         let outputRoot = root.appendingPathComponent("output")

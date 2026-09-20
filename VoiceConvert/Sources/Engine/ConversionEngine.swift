@@ -182,6 +182,12 @@ public final class ConversionEngine: @unchecked Sendable {
 
             if isCancelled?() == true { throw ConversionError.cancelled }
             try handle.write(contentsOf: encoder.flush())
+            // LAME 在流开头预留的空占位帧必须回填成 VBR 头，否则播放器按首帧码率估算时长。
+            let lametagFrame = try encoder.lametagFrame()
+            if !lametagFrame.isEmpty {
+                try handle.seek(toOffset: 0)
+                try handle.write(contentsOf: lametagFrame)
+            }
             try handle.synchronize()
         } catch let error as ConversionError {
             throw error

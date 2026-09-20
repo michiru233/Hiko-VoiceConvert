@@ -41,6 +41,37 @@ struct VoiceConvertCLITests {
         #expect(FileManager.default.fileExists(atPath: outputRoot.appendingPathComponent("scene (1).mp3").path))
     }
 
+    @Test func audioOutputCarriesVBRHeaderSoPlaybackDurationMatchesSource() throws {
+        let value = try fixture()
+        defer { try? FileManager.default.removeItem(at: value.root) }
+        let outputRoot = value.root.deletingLastPathComponent().appendingPathComponent("voiceconvert-vbr-\(UUID().uuidString)", isDirectory: true)
+        let code = CLI(arguments: ["audio", value.audio.path, "--output", outputRoot.path], out: { _ in }, err: { _ in }).run()
+        #expect(code == .success)
+
+        // 播放器显示的时长来自 Xing/Info 头；该头缺失时只能按首帧码率估算，时长就对不上。
+        let source = try AVAudioFile(forReading: value.audio)
+        let sourceDuration = Double(source.length) / source.processingFormat.sampleRate
+        let playbackDuration = try #require(try vbrHeaderDuration(of: outputRoot.appendingPathComponent("scene.mp3"), sampleRate: 48_000))
+        #expect(abs(playbackDuration - sourceDuration) <= 0.1)
+    }
+
+    /// Xing/Info 头记录的总帧数换算出的时长，即播放器实际显示的时长。返回 nil 表示该头缺失。
+    private func vbrHeaderDuration(of mp3: URL, sampleRate: Double) throws -> TimeInterval? {
+        let bytes = Array(try Data(contentsOf: mp3).prefix(2_048))
+        let magics = [Array("Xing".utf8), Array("Info".utf8)]
+        guard let start = bytes.indices.first(where: { index in
+            let rest = bytes[index...]
+            return magics.contains { rest.starts(with: $0) }
+        }) else { return nil }
+        let flagsIndex = start + 4
+        let framesIndex = flagsIndex + 4
+        guard framesIndex + 4 <= bytes.count else { return nil }
+        let flags = bytes[flagsIndex..<flagsIndex + 4].reduce(0) { ($0 << 8) | Int($1) }
+        guard flags & 0x1 == 1 else { return nil }
+        let frames = bytes[framesIndex..<framesIndex + 4].reduce(0) { ($0 << 8) | Int($1) }
+        return Double(frames) * 1_152 / sampleRate
+    }
+
     @Test func audioSkipPolicyPreservesSentinelAndReturnsPartialFailure() throws {
         let value = try fixture()
         defer { try? FileManager.default.removeItem(at: value.root) }

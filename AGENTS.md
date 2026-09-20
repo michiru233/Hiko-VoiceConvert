@@ -15,7 +15,7 @@ swift test --package-path VoiceConvertCore --disable-sandbox
 swift test --package-path VoiceConvertCLI --disable-sandbox
 ```
 
-GitHub Actions 在 push/PR 上运行上述 SwiftPM 与 Xcode 命令。GitHub Release `v1.1.2` 已发布，包含 App、CLI、动态库、许可证和独立更新 helper；Developer ID 签名、公证和完整第三方来源核查仍待完成。每次代码或修复完成后必须：跑测试、更新版本与变更日志、执行 `scripts/export-release.zsh`、提交并推送 `main`、创建版本 tag、发布 GitHub Release，并上传 zip 与 `.sha256`。
+GitHub Actions 在 push/PR 上运行上述 SwiftPM 与 Xcode 命令；推送 `v*` tag 会触发 `release.yml` 自动测试、封包、校验 SHA-256 并创建 GitHub Release。Developer ID 签名、公证和完整第三方来源核查仍待完成。每次代码或修复完成后必须：跑测试、更新版本与变更日志、执行 `scripts/export-release.zsh`、提交并推送 `main`、创建版本 tag，由自动 workflow 发布 Release 并上传 zip 与 `.sha256`。
 
 ## 技术栈
 
@@ -35,4 +35,4 @@ Swift 6、SwiftUI/AppKit、AVFoundation、Combine，以及内置 arm64 LAME/mpg1
 
 ## 当前状态
 
-Release `v1.1.2` 已发布并验证（tag、远端 CI 和 zip/checksum 均通过）。当前代码已接入 GitHub Releases 更新检查、SHA-256/压缩包校验、用户确认安装和独立临时 helper；本轮 `v1.1.3` 将只同步现役文档、发布流程和版本事实。Developer ID 签名、公证、完整第三方来源核查仍待完成。下一步候选：CLI 取消/重试/最近批次、三条工作流统一最近批次，以及为发布脚本加入自动 CI 资产构建。
+Release `v1.1.8` 修复了转出 MP3 时长与源文件不一致（未回填 LAME 的 VBR/Xing 标记帧）以及发布脚本复制陈旧 CLI 产物两个问题；tag 推送后由 `release.yml` 自动发布。Developer ID 签名、公证、完整第三方来源核查仍待完成。下一步候选：CLI 取消/重试/最近批次、三条工作流统一最近批次。

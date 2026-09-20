@@ -2,12 +2,16 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VERSION="${1:-1.1.7}"
+VERSION="${1:-1.1.8}"
 STAGING="$ROOT/build/release-staging"
 DIST="$ROOT/build/Hiko-VoiceConvert-v${VERSION}-macos-arm64"
 APP="$ROOT/build/Release/音声转换.app"
-CLI="$ROOT/VoiceConvertCLI/.build/arm64-apple-macosx/release/voiceconvert"
 HELPER_BUILD="$ROOT/build/update-helper"
+
+# 由 SwiftPM 解析实际产物目录，不写死布局：本机 SwiftPM 输出到 .build/out/Products/Release，
+# 写死 .build/arm64-apple-macosx/release 会静默复制到上一次构建的陈旧二进制。
+swift build --package-path "$ROOT/VoiceConvertCLI" -c release --disable-sandbox >/dev/null
+CLI="$(swift build --package-path "$ROOT/VoiceConvertCLI" -c release --disable-sandbox --show-bin-path)/voiceconvert"
 
 rm -rf "$STAGING" "$DIST" "$DIST.zip" "$DIST.zip.sha256"
 mkdir -p "$STAGING/App" "$STAGING/CLI" "$STAGING/ThirdParty/licenses" "$STAGING/Docs" "$STAGING/App/音声转换.app/Contents/Resources/Helpers"

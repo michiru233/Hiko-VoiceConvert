@@ -1,6 +1,6 @@
 # 当前进度
 
-目标是将音频转换、WebVTT→LRC 字幕转换和配对处理统一为可批量使用、可测试、可发布的 macOS 原生 v1.1.3 工具。
+目标是将音频转换、WebVTT→LRC 字幕转换和配对处理统一为可批量使用、可测试、可发布的 macOS 原生 v1.1.8 工具。
 
 ## 已完成并验证
 
@@ -10,14 +10,18 @@
 - SwiftPM CLI 已接入真实 AVFoundation/LAME 音频后端，`audio`、`subtitle`、`pair` 均可执行。
 - App 已接入 GitHub Releases 更新检查、正式 arm64 资产筛选、SHA-256/压缩包安全校验、用户确认安装和独立临时 helper；helper 在主 App 退出后原子替换、重启新 App，失败保留旧 App 并清理临时目录。
 - 产品名“音声转换”、Bundle ID `com.voiceconvert.app`、arm64 和 macOS 26.0 约束保持不变。
+- 修复转出 MP3 时长与源文件不一致：编码结束后未回填 LAME 在流开头预留的 VBR/Xing 标记帧，播放器只能按首帧码率估算时长（10.000 s 源显示为 7.31 s）。GUI 与 CLI 两条路径现都回填该帧；音频载荷逐字节不变。
+- 修复 `scripts/export-release.zsh` 复制陈旧 CLI 产物：写死的 `.build/arm64-apple-macosx/release` 在本机 SwiftPM 输出到 `.build/out/Products/Release` 的布局下会静默打包上一次构建的二进制；现改为先构建再由 `--show-bin-path` 解析实际目录。
 
 ## 当前验证
 
 - `VoiceConvertCore` SwiftPM：73/73 测试通过，包含更新版本、Release 解析、checksum 和 zip-slip 测试。
-- `VoiceConvertCLI` SwiftPM：5/5 测试通过，包含真实 AVFoundation WAV→MP3、字幕、配对和退出码测试。
-- Xcode Debug build/test：通过；远端 GitHub Actions 对提交 `814d261` 的运行通过。
-- Release `v1.1.2` 已发布；包内含独立 `App/音声转换.app/Contents/Resources/Helpers/update-helper`，下载后 SHA-256 校验通过。
-- 本轮文档同步目标：让规则、README、CHANGELOG、PROGRESS、BLOCKED 与 v1.1.2 已发布的实际状态一致，并保留历史 Release notes。
+- `VoiceConvertCLI` SwiftPM：6/6 测试通过，包含真实 AVFoundation WAV→MP3、字幕、配对、退出码和新增的 VBR 头时长测试。
+- Xcode Debug build/test：通过，13/13；新增 `testOutputCarriesVBRHeaderSoPlaybackDurationMatchesSource`。
+- 两条新增回归测试均已做“撤掉修复即变红”校验。
+- 时长修复覆盖 44.1/48/32 kHz、单声道/双声道、0.5–10 s：播放器时长与源一致，VBR 头全部存在，解码无错误。
+- Release `v1.1.8` 打包后解压实测包内 CLI：`player=10.031 s`（源 10.000 s）、`vbr=yes`，解码内容与源精确一致。
+- 发布工作流的 tag/版本一致性校验（`CFBundleShortVersionString` 与 `UpdateCore.currentVersionString`）在本地模拟通过，`git diff --check` 通过。
 
 ## 尚未完成或待补证据
 
@@ -50,7 +54,11 @@
 ## 本轮发布命令
 
 - `swift test --package-path VoiceConvertCore --disable-sandbox`：通过，73/73。
-- `swift test --package-path VoiceConvertCLI --disable-sandbox`：通过，5/5。
-- Xcode Debug build/test：通过。
-- `zsh scripts/export-release.zsh 1.1.2`：通过，v1.1.2 zip 与 `.sha256` 已发布。
+- `swift test --package-path VoiceConvertCLI --disable-sandbox`：通过，6/6。
+- Xcode Debug build/test：通过，13/13。
+- Red-check：分别撤掉 GUI 与 CLI 修复后，两条新增 VBR 头测试各自失败；恢复后通过。
+- `xcodebuild ... -configuration Release -sdk macosx -arch arm64 build CODE_SIGNING_ALLOWED=NO`：通过。
+- `swift build --package-path VoiceConvertCLI -c release --disable-sandbox`：通过。
+- `zsh scripts/export-release.zsh 1.1.8`：通过，生成 v1.1.8 zip 与 `.sha256`；解压后包内 CLI 实测时长正确。
+- `shasum -a 256 -c` 与 `codesign --verify --strict`：通过。
 - `git diff --check`：通过。

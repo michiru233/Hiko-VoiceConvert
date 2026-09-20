@@ -1,5 +1,12 @@
 # 变更日志
 
+## 1.1.8 - 2026-09-20
+
+### 修复
+
+- 修复转出的 MP3 时长与源文件不一致：编码结束后未回填 LAME 在流开头预留的 VBR/Xing 标记帧，播放器只能按首帧码率估算整段时长。现在 GUI 与 CLI 都会写入该标记帧，播放器显示时长与源一致
+- 修复发布脚本复制陈旧 CLI 二进制：`scripts/export-release.zsh` 写死 `.build/arm64-apple-macosx/release` 路径，而在输出到 `.build/out/Products/Release` 的 SwiftPM 布局下会静默打包上一次构建的产物。现在改为先构建再由 SwiftPM 解析实际产物目录
+
 ## 1.1.7 - 2026-09-03
 
 ### 修复

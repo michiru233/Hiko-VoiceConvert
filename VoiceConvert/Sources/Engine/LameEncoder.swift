@@ -142,4 +142,17 @@ public final class LameEncoder {
 
         return Data(mp3Buffer.prefix(Int(bytesWritten)))
     }
+
+    /// 取回 MP3 流开头的 VBR/Xing 标记帧。必须在 `flush()` 之后调用。
+    /// LAME 在流开头预留了一个空占位帧，调用方须用本方法的返回值覆写文件偏移 0；
+    /// 不回填时播放器只能按首帧码率估算整段时长（时长显示错误）。
+    public func lametagFrame() throws -> Data {
+        guard let flags = lameFlags, isConfigured else { throw LameError.initFailed }
+        var tagBuffer = [UInt8](repeating: 0, count: 8_192)
+        let size = Int(lame_get_lametag_frame(flags, &tagBuffer, tagBuffer.count))
+        guard size <= tagBuffer.count else {
+            throw LameError.flushFailed(Int32(clamping: size))
+        }
+        return Data(tagBuffer.prefix(size))
+    }
 }

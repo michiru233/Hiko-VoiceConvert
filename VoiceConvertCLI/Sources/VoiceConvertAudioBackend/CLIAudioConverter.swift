@@ -155,6 +155,14 @@ public final class CLIAudioConverter: @unchecked Sendable {
             let flushed = lame_encode_flush(flags, &flush, Int32(flush.count))
             guard flushed >= 0 else { throw CLIAudioError.encoder("编码刷新失败 (\(flushed))") }
             try handle.write(contentsOf: Data(flush.prefix(Int(flushed))))
+            // LAME 在流开头预留的空占位帧必须回填成 VBR 头，否则播放器按首帧码率估算时长。
+            var lametag = [UInt8](repeating: 0, count: 8_192)
+            let lametagSize = Int(lame_get_lametag_frame(flags, &lametag, lametag.count))
+            guard lametagSize <= lametag.count else { throw CLIAudioError.encoder("LAME 标记帧读取失败") }
+            if lametagSize > 0 {
+                try handle.seek(toOffset: 0)
+                try handle.write(contentsOf: Data(lametag.prefix(lametagSize)))
+            }
             try handle.synchronize()
         } catch let error as CLIAudioError {
             throw error
